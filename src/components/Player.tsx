@@ -12,12 +12,6 @@ export default function Player() {
 
   const isFavorite = currentTrack && favorites.some(t => t.id === currentTrack.id);
 
-  const [isReady, setIsReady] = useState(false);
-
-  React.useEffect(() => {
-    setIsReady(false);
-  }, [currentTrack?.id]);
-
   if (!currentTrack) return null;
 
   const handleProgress = (state: { playedSeconds: number, played: number }) => {
@@ -35,32 +29,44 @@ export default function Player() {
   const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPlayed = parseFloat(e.target.value);
     setPlayed(newPlayed);
-    playerRef.current?.seekTo(newPlayed);
+    playerRef.current?.seekTo(newPlayed, 'fraction');
   };
+
+  const playerConfig = React.useMemo(() => ({
+    youtube: {
+      playerVars: {
+        autoplay: 1,
+        controls: 0,
+        disablekb: 1,
+        fs: 0,
+        modestbranding: 1,
+        rel: 0,
+        showinfo: 0,
+        vq: 'tiny',
+        playsinline: 1,
+        origin: typeof window !== 'undefined' ? window.location.origin : undefined
+      }
+    }
+  }), []);
 
   return (
     <div className="absolute bottom-0 left-0 right-0 h-24 glass z-30 px-10 flex items-center justify-between">
-      {/* Hidden YouTube Player */}
-      <ReactPlayer
-        ref={playerRef}
-        url={currentTrack.url}
-        playing={isPlaying}
-        volume={volume}
-        muted={muted}
-        onEnded={nextTrack}
-        onProgress={handleProgress}
-        onReady={() => setIsReady(true)}
-        onPlay={() => { if (!isPlaying) play(); }}
-        onPause={() => { if (isPlaying) pause(); }}
-        width="1px"
-        height="1px"
-        style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}
-        config={{
-          youtube: {
-            playerVars: { controls: 0, showinfo: 0, rel: 0, vq: 'tiny', playsinline: 1 }
-          }
-        }}
-      />
+      {/* Hidden YouTube Player, kept inside viewport to prevent browser throttling in background tabs */}
+      <div className="absolute top-0 left-0 w-10 h-10 opacity-[0.01] pointer-events-none overflow-hidden z-[-1]">
+        <ReactPlayer
+          ref={playerRef}
+          url={currentTrack.url}
+          playing={isPlaying}
+          volume={volume}
+          muted={muted}
+          onEnded={nextTrack}
+          onProgress={handleProgress}
+          width="100%"
+          height="100%"
+          playsinline
+          config={playerConfig}
+        />
+      </div>
 
       {/* Track Info */}
       <div className="flex items-center w-1/4 min-w-[200px]">

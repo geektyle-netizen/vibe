@@ -44,7 +44,7 @@ export default function Player() {
       <ReactPlayer
         ref={playerRef}
         url={currentTrack.url}
-        playing={isReady && isPlaying}
+        playing={isPlaying}
         volume={volume}
         muted={muted}
         onEnded={nextTrack}
@@ -52,12 +52,12 @@ export default function Player() {
         onReady={() => setIsReady(true)}
         onPlay={() => { if (!isPlaying) play(); }}
         onPause={() => { if (isPlaying) pause(); }}
-        width="0"
-        height="0"
-        style={{ display: 'none' }}
+        width="1px"
+        height="1px"
+        style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}
         config={{
           youtube: {
-            playerVars: { controls: 0, showinfo: 0, rel: 0 }
+            playerVars: { controls: 0, showinfo: 0, rel: 0, vq: 'tiny', playsinline: 1 }
           }
         }}
       />

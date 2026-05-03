@@ -1,0 +1,5 @@
+{
+  "name": "Wave Player",
+  "description": "An online music player powered by YouTube with playlists, favorites, and background playback.",
+  "requestFramePermissions": []
+}
